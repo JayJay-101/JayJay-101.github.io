@@ -164,6 +164,10 @@
                   Random
                  </a>
             </div>
+            <div class="ml-1 close-styler outer radius-2 d-inline-block">
+               <a class="inner radius-2 d-block px-4 py-1 font-size-13 text-alt font-weight-500" href="#">                  Close
+               </a>
+            </div>
          </div>
       </div>
       <div class="parallax position-absolute d-none d-lg-block" data-relative-input="true">
@@ -2169,6 +2173,29 @@
       }
    </script>
    <script src="contact-handler.js"></script>
+   <script>
+      let currentIndex = 1;
+      let intervalId;
+      
+      function cycleColor() {
+        if (!intervalId) {
+          intervalId = setInterval(() => {
+            setActiveStyleSheet('clr-' + currentIndex);
+            currentIndex = currentIndex >= 33 ? 1 : currentIndex + 1;
+          }, 1000); // Change every second
+          document.getElementById('colorBtn').textContent = 'Stop';
+        } else {
+          clearInterval(intervalId);
+          intervalId = null;
+          document.getElementById('colorBtn').textContent = 'Cycle';
+        }
+      }
+      
+      // Cleanup on page unload
+      window.addEventListener('unload', () => {
+        if (intervalId) clearInterval(intervalId);
+      });
+      </script>
 </body>
 
 </html>
