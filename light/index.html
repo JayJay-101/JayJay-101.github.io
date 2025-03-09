@@ -1959,7 +1959,25 @@
    }
    </script>
 <script>
-   const aiSkills = [
+
+   // Unified skills data
+const skillsData = {
+  "backendSkillsList": {
+    skills: [
+      { name: "PHP, Laravel", percentage: 90 },
+      { name: "PYTHON, JAVA", percentage: 90 },
+      { name: "ANDROID STUDIO, C /C++", percentage: 70 },
+      { name: "API Design & Development", percentage: 85 },
+      { name: "Transaction Management", percentage: 80 },
+      { name: "Database Optimization (SQL/MySQL /noSQL)", percentage: 85 },
+      { name: "Microservice Architecture", percentage: 60 },
+      { name: "RESTful API Development", percentage: 90 },
+      { name: "Inertia.js Integration", percentage: 90 }
+    ],
+    color: "#4285F4"
+  },
+  "AIKnowledge": {
+    skills: [
       { name: "Machine Learning Algorithms", percentage: 75 },
       { name: "Deep Learning Models", percentage: 70 },
       { name: "ONNX Runtime", percentage: 85 },
@@ -1968,99 +1986,91 @@
       { name: "Computer Vision", percentage: 78 },
       { name: "Data Visualization (Matplotlib, Seaborn)", percentage: 80 },
       { name: "EDA (Exploratory Data Analysis)", percentage: 85 }
-   ];
+    ],
+    color: "#FBBC05"
+  },
+  "DevelopmentSkillsList": {
+    skills: [
+      { name: "GIT CI/CD", percentage: 85 },
+      { name: "VS CODE", percentage: 85 },
+      { name: "LINUX OPS", percentage: 85 },
+      { name: "Code Review & Documentation", percentage: 80 },
+      { name: "Agile/SCRUM Methodologies", percentage: 89 },
+      { name: "TEST DRIVEN DEVELOPMENT", percentage: 96 }
+    ],
+    color: "#EA4335"
+  }
+};
 
-   const aiContainer = document.getElementById("AIKnowledge");
+// Function to animate progress from 0 to target percentage
+function animateProgress(element, targetPercentage) {
+  let width = 0;
+  const duration = 666; // Animation duration in ms
+  const interval = 16; // Update interval (roughly 60fps)
+  const steps = duration / interval;
+  const increment = targetPercentage / steps;
+  
+  const animation = setInterval(() => {
+    width += increment;
+    
+    if (width >= targetPercentage) {
+      width = targetPercentage;
+      clearInterval(animation);
+    }
+    
+    element.style.width = `${width}%`;
+  }, interval);
+}
 
-   aiSkills.forEach(skill => {
-      const skillTemplate = `
-         <li>
-            <h6 class="font-weight-600 font-size-14 text-uppercase">${skill.name}</h6>
-            <div class="progress mb-3">
-               <div class="percentage" style="width: ${skill.percentage}%; background-color: #F0A202 !important;">
-                  
-                  </div>
-            </div>
-         </li>
-      `;
-      aiContainer.innerHTML += skillTemplate;
-   });
-</script>
-<script>
-   const DEVSkills = [
-      { name: "GIT  CI/CD ", percentage: 85 },
-      { name: "VS CODE ", percentage: 85 },
-      { name: "LINX ops ", percentage: 85 },
-      { name: "Code Review & DocumentatioN", percentage: 80 },
-      { name: "Agile/SCRUM methodologies", percentage: 89 },
-      { name: "TEST DRIVEN DEVELOPMENT", percentage: 96 },
-   ];
-
-   const DEVContainer = document.getElementById("DevelopmentSkillsList");
-
-   DEVSkills.forEach(skill => {
-      const skillTemplate = `
-         <li>
-            <h6 class="font-weight-600 font-size-14 text-uppercase">${skill.name}</h6>
-            <div class="progress mb-3">
-               <div class="percentage" style="width: ${skill.percentage}%; background-color: #1DB954 !important;">
-                  
-                  </div>
-            </div>
-         </li>
-      `;
-      DEVContainer.innerHTML += skillTemplate;
-   });
-</script>
-
-<script>
-   const backendSkills = [
-     { skill: "PHP, Laravel", percentage: 90 },
-     { skill: "PYTHON, JAVA", percentage: 90 },
-     { skill: "ANDROID STUDIO, C /C++", percentage: 70 },
-     { skill: "API Design & Development", percentage: 85 },
-     { skill: "Transaction Management", percentage: 80 },
-     { skill: "Database Optimization (SQL/MySQL /noSQL)", percentage: 85 },
-     { skill: "Microservice Architecture", percentage: 60 },
-     { skill: "RESTful API Development", percentage: 90 },
-     { skill: "Inertia.js Integration", percentage: 90 },
-     { skill: "ANDROID STUDIO, C /C++", percentage: 70 },
-
-   ];
-   
-   const skillsContainer = document.getElementById("backendSkillsList");
-   
-   // Make sure the container element exists
-   if (skillsContainer) {
-     backendSkills.forEach(({ skill, percentage }) => {
-       const listItem = `
-         <li>
-           <h6 class="font-weight-600 font-size-14 text-uppercase">${skill}</h6>
-           <div class="progress mb-3">
-             <div class="percentage" style="width: ${percentage}%; background-color: #E94F37 !important;"></div>
-           </div>
-         </li>
-       `;
-       skillsContainer.innerHTML += listItem;
-     });
-   } else {
-     console.error("Element with ID 'backendSkillsList' not found");
-   }
-
-    // Add this to your document ready function or at the end of the body
-   
-      // Add this to your document ready function or at the end of the body
-document.addEventListener('DOMContentLoaded', function() {
-   // Check if we have a saved scroll position
-   const savedScrollPosition = localStorage.getItem('scrollPosition');
-   
-   if (savedScrollPosition) {
-      // Restore scroll position
-      window.scrollTo(0, parseInt(savedScrollPosition));
+// Initialize all skill sections
+document.addEventListener('DOMContentLoaded', () => {
+  // Create observer instance
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Get all progress bars within this container
+        const progressBars = entry.target.querySelectorAll('.percentage');
+        
+        // Animate each progress bar
+        progressBars.forEach(bar => {
+          const targetWidth = bar.getAttribute('data-target');
+          animateProgress(bar, targetWidth);
+        });
+        
+        // Unobserve after animation starts
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 }); // Trigger when at least 20% of the element is visible
+  
+  // Process each skills section
+  Object.keys(skillsData).forEach(containerId => {
+    const container = document.getElementById(containerId);
+    
+    if (container) {
+      const { skills, color } = skillsData[containerId];
       
-      // Clear the saved position so it doesn't affect future page loads
-      localStorage.removeItem('scrollPosition');
-   }
+      // Clear container first (optional - remove if you want to append to existing content)
+      container.innerHTML = '';
+      
+      // Add skills with initial 0% width
+      skills.forEach(skill => {
+        const listItem = `
+          <li>
+            <h6 class="font-weight-600 font-size-14 text-uppercase">${skill.name}</h6>
+            <div class="progress mb-3">
+              <div class="percentage" data-target="${skill.percentage}" 
+                  style="width: 0%; background-color: ${color} !important;"></div>
+            </div>
+          </li>
+        `;
+        container.innerHTML += listItem;
+      });
+      
+      // Observe the container
+      observer.observe(container);
+    }
+  });
 });
    </script>
 </body>
