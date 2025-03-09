@@ -1916,24 +1916,48 @@
    <script src="js/script.js"></script>
    <!-- Google analytics -->
    <!-- End google analytics -->
-   <script>
-      function switchTheme(theme) {
-     // Get the currently active navigation item
-     const activeNav = document.querySelector('a.inner.active');
-     let currentSection = '';
-     
-     // Extract the fragment from the active navigation item if it exists
-     if (activeNav && activeNav.getAttribute('href').startsWith('#')) {
-        currentSection = activeNav.getAttribute('href');
-     }
-     
-     // Store the theme preference
-     localStorage.setItem('theme', theme);
-     
-     // Redirect while preserving the current section
-     window.location.href = (theme === 'dark' ? '/dark/' : '/light/') + currentSection;
-  }
-     </script>
+   
+<script>
+   function switchTheme(theme) {
+      // Get the currently active navigation item
+      const activeNav = document.querySelector('a.inner.active');
+      let currentSection = '';
+      
+      // Extract the fragment from the active navigation item if it exists
+      if (activeNav && activeNav.getAttribute('href').startsWith('#')) {
+         currentSection = activeNav.getAttribute('href');
+      }
+      
+      // Get current scroll position
+      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Store the theme preference and scroll position
+      localStorage.setItem('theme', theme);
+      localStorage.setItem('scrollPosition', scrollPosition);
+      
+      // Redirect while preserving the current section
+      window.location.href = (theme === 'dark' ? '/dark/' : '/light/') + currentSection;
+   }
+   
+   // Use both DOMContentLoaded and a backup timer for more reliability
+   document.addEventListener('DOMContentLoaded', restoreScrollPosition);
+   
+   // Backup timer in case DOMContentLoaded isn't sufficient
+   setTimeout(restoreScrollPosition, 500);
+   
+   function restoreScrollPosition() {
+      const savedScrollPosition = localStorage.getItem('scrollPosition');
+      
+      if (savedScrollPosition !== null) {
+         // Use a small delay to ensure the page is ready
+         setTimeout(function() {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            // Only remove after successful restoration
+            localStorage.removeItem('scrollPosition');
+         }, 200);
+      }
+   }
+   </script>
 <script>
    const aiSkills = [
       { name: "Machine Learning Algorithms", percentage: 75 },
@@ -2022,6 +2046,22 @@
    } else {
      console.error("Element with ID 'backendSkillsList' not found");
    }
+
+    // Add this to your document ready function or at the end of the body
+   
+      // Add this to your document ready function or at the end of the body
+document.addEventListener('DOMContentLoaded', function() {
+   // Check if we have a saved scroll position
+   const savedScrollPosition = localStorage.getItem('scrollPosition');
+   
+   if (savedScrollPosition) {
+      // Restore scroll position
+      window.scrollTo(0, parseInt(savedScrollPosition));
+      
+      // Clear the saved position so it doesn't affect future page loads
+      localStorage.removeItem('scrollPosition');
+   }
+});
    </script>
 </body>
 

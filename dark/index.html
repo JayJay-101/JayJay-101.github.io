@@ -75,11 +75,13 @@
             </div>
          </div>
          <div class="day-night-mode">
+          
             <div class="outer radius-1 d-inline-block">
                <a class="inner radius-1 d-block" href="#" onclick="switchTheme('light'); return false;">
                   <span class="fa fa-sun"></span>
                </a>
             </div>
+
          </div>
          <div>
             <h6 class="text-muted font-weight-400 mb-0">Pick a color</h6>
@@ -1872,24 +1874,49 @@
    <script src="js/script.js"></script>
    <!-- Google analytics -->
    <!-- End google analytics -->
-   <script>
-    function switchTheme(theme) {
-   // Get the currently active navigation item
-   const activeNav = document.querySelector('a.inner.active');
-   let currentSection = '';
-   
-   // Extract the fragment from the active navigation item if it exists
-   if (activeNav && activeNav.getAttribute('href').startsWith('#')) {
-      currentSection = activeNav.getAttribute('href');
+ 
+<script>
+   function switchTheme(theme) {
+      // Get the currently active navigation item
+      const activeNav = document.querySelector('a.inner.active');
+      let currentSection = '';
+      
+      // Extract the fragment from the active navigation item if it exists
+      if (activeNav && activeNav.getAttribute('href').startsWith('#')) {
+         currentSection = activeNav.getAttribute('href');
+      }
+      
+      // Get current scroll position
+      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Store the theme preference and scroll position
+      localStorage.setItem('theme', theme);
+      localStorage.setItem('scrollPosition', scrollPosition);
+      
+      // Redirect while preserving the current section
+      window.location.href = (theme === 'dark' ? '/dark/' : '/light/') + currentSection;
    }
    
-   // Store the theme preference
-   localStorage.setItem('theme', theme);
+   // Use both DOMContentLoaded and a backup timer for more reliability
+   document.addEventListener('DOMContentLoaded', restoreScrollPosition);
    
-   // Redirect while preserving the current section
-   window.location.href = (theme === 'dark' ? '/dark/' : '/light/') + currentSection;
-}
+   // Backup timer in case DOMContentLoaded isn't sufficient
+   setTimeout(restoreScrollPosition, 500);
+   
+   function restoreScrollPosition() {
+      const savedScrollPosition = localStorage.getItem('scrollPosition');
+      
+      if (savedScrollPosition !== null) {
+         // Use a small delay to ensure the page is ready
+         setTimeout(function() {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            // Only remove after successful restoration
+            localStorage.removeItem('scrollPosition');
+         }, 200);
+      }
+   }
    </script>
+
    <script src="contact-handler.js"></script>
    <script>
       let currentIndex = 1;
@@ -2003,6 +2030,7 @@
    } else {
      console.error("Element with ID 'backendSkillsList' not found");
    }
+ 
    </script>
 
 </body>
