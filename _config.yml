@@ -1,0 +1,22 @@
+staticman_url: https://api.staticman.net/v3/entry/github/JayJay-101/JayJay-101.github.io/main/comments
+
+comments:
+  allowedFields: ["name", "email", "url", "message"]
+  branch: "main"
+  commitMessage: "New comment by {fields.name}"
+  filename: "comment-{@timestamp}"
+  format: "yaml"
+  generatedFields:
+    date:
+      type: date
+      options:
+        format: "timestamp-seconds"
+  moderation: true
+  path: "_data/comments/{options.slug}"
+  requiredFields: ["name", "message", "g-recaptcha-response"]
+  transforms:
+    email: md5
+  reCaptcha:
+    enabled: true
+    siteKey: ""
+    secret: ""
