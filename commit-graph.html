@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Contribution Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #8b949e;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .filter-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #30363d;
+        }
+
+        .filter-btn.active {
+            background: #238636;
+            border-color: #238636;
+        }
+
+        .graph-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .contribution-graph {
+            display: inline-block;
+            min-width: fit-content;
+        }
+
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .months {
+            display: flex;
+            margin-bottom: 8px;
+            margin-left: 30px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .month {
+            width: 14px;
+            text-align: center;
+        }
+
+        .graph-body {
+            display: flex;
+        }
+
+        .weekdays {
+            display: flex;
+            flex-direction: column;
+            margin-right: 4px;
+            font-size: 10px;
+            color: #8b949e;
+        }
+
+        .weekday {
+            height: 14px;
+            line-height: 14px;
+            margin: 1px 0;
+        }
+
+        .weeks {
+            display: flex;
+            gap: 2px;
+        }
+
+        .week {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+        }
+
+        .day:hover {
+            border-color: rgba(240, 246, 252, 0.4);
+            transform: scale(1.1);
+        }
+
+        .day.level-0 { background: #161b22; }
+        .day.level-1 { background: #0e4429; }
+        .day.level-2 { background: #006d32; }
+        .day.level-3 { background: #26a641; }
+        .day.level-4 { background: #39d353; }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .legend-item {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #1c2128;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #c9d1d9;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip-date {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .tooltip-commits {
+            color: #8b949e;
+        }
+
+        .details-panel {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .details-panel.show {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .details-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .repo-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .repo-item {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .repo-name {
+            font-weight: 500;
+            color: #58a6ff;
+        }
+
+        .repo-commits {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .summary-card h3 {
+            color: #c9d1d9;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🔒 Private Repository Contributions</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <span id="total-commits">0</span> contributions in the last year
+                </div>
+                <div class="stat-item">
+                    <span id="total-repos">0</span> repositories
+                </div>
+                <div class="stat-item">
+                    Longest streak: <span id="longest-streak">0</span> days
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="filter-btn active" data-period="year">Last Year</button>
+            <button class="filter-btn" data-period="6months">Last 6 Months</button>
+            <button class="filter-btn" data-period="3months">Last 3 Months</button>
+            <button class="filter-btn" data-period="all">All Time</button>
+        </div>
+
+        <div class="graph-container">
+            <div class="contribution-graph">
+                <div class="months" id="months-row"></div>
+                <div class="graph-body">
+                    <div class="weekdays">
+                        <div class="weekday"></div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday"></div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday"></div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday"></div>
+                    </div>
+                    <div class="weeks" id="weeks-container"></div>
+                </div>
+                <div class="legend">
+                    <span>Less</span>
+                    <div class="legend-item level-0"></div>
+                    <div class="legend-item level-1"></div>
+                    <div class="legend-item level-2"></div>
+                    <div class="legend-item level-3"></div>
+                    <div class="legend-item level-4"></div>
+                    <span>More</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-panel" id="details-panel">
+            <div class="details-title">Selected Day Details</div>
+            <div id="selected-details"></div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>Total Contributions</h3>
+                <div class="value" id="total-contributions">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Active Days</h3>
+                <div class="value" id="active-days">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Average per Day</h3>
+                <div class="value" id="avg-per-day">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Most Productive Day</h3>
+                <div class="value" id="max-day">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Sample data - replace this with your actual contribution data
+          
+const contributionData = {
+  "generated_at": "2025-08-27T13:17:10.526692",
+  "total_repos": 30,
+  "total_commits": 570,
+  "date_range": {
+    "start": "2018-07-26",
+    "end": "2025-08-26"
+  },
+  "daily_counts": {
+    "2021-08-11": 3,
+    "2021-07-25": 2,
+    "2021-06-05": 17,
+    "2021-06-04": 2,
+    "2021-06-03": 5,
+    "2021-05-21": 5,
+    "2021-05-06": 2,
+    "2021-04-21": 1,
+    "2021-04-20": 1,
+    "2021-04-19": 2,
+    "2021-03-24": 1,
+    "2021-03-23": 6,
+    "2021-03-22": 1,
+    "2021-03-21": 9,
+    "2021-03-18": 2,
+    "2021-03-17": 18,
+    "2021-03-13": 20,
+    "2021-03-07": 9,
+    "2021-01-13": 3,
+    "2020-11-25": 5,
+    "2025-03-06": 5,
+    "2025-03-05": 2,
+    "2025-03-11": 1,
+    "2025-03-10": 1,
+    "2025-03-07": 6,
+    "2025-08-21": 8,
+    "2025-08-20": 11,
+    "2025-06-23": 8,
+    "2025-06-11": 6,
+    "2025-06-10": 3,
+    "2025-06-09": 4,
+    "2025-06-08": 2,
+    "2025-06-07": 1,
+    "2025-06-05": 2,
+    "2025-06-01": 10,
+    "2025-05-31": 6,
+    "2025-05-30": 3,
+    "2025-05-28": 4,
+    "2025-05-27": 6,
+    "2025-05-22": 2,
+    "2025-05-20": 1,
+    "2025-08-22": 9,
+    "2025-08-25": 8,
+    "2025-08-24": 2,
+    "2025-08-23": 3,
+    "2025-05-25": 1,
+    "2025-05-24": 1,
+    "2025-05-23": 2,
+    "2025-04-29": 2,
+    "2025-04-28": 1,
+    "2025-04-26": 6,
+    "2025-04-25": 1,
+    "2023-10-10": 1,
+    "2022-08-29": 2,
+    "2019-12-23": 10,
+    "2019-12-22": 1,
+    "2023-05-14": 3,
+    "2021-04-06": 13,
+    "2021-04-05": 33,
+    "2021-12-11": 3,
+    "2025-07-13": 1,
+    "2025-07-11": 4,
+    "2025-07-10": 3,
+    "2024-11-16": 14,
+    "2024-11-24": 8,
+    "2024-11-23": 10,
+    "2024-11-18": 1,
+    "2024-11-17": 6,
+    "2023-12-04": 1,
+    "2025-04-20": 1,
+    "2025-03-09": 3,
+    "2025-02-28": 2,
+    "2025-02-27": 2,
+    "2025-02-23": 7,
+    "2021-06-12": 1,
+    "2021-06-11": 7,
+    "2025-06-12": 7,
+    "2025-01-31": 1,
+    "2024-03-05": 3,
+    "2024-02-14": 2,
+    "2024-02-02": 4,
+    "2023-08-22": 2,
+    "2023-01-20": 2,
+    "2022-12-13": 1,
+    "2022-10-11": 3,
+    "2022-09-07": 1,
+    "2022-08-19": 1,
+    "2022-08-11": 1,
+    "2022-07-29": 2,
+    "2022-06-28": 1,
+    "2022-06-08": 1,
+    "2022-06-06": 1,
+    "2022-06-02": 1,
+    "2022-05-30": 1,
+    "2022-05-27": 1,
+    "2022-05-22": 1,
+    "2022-05-17": 3,
+    "2022-05-10": 1,
+    "2022-04-30": 1,
+    "2022-04-28": 1,
+    "2022-04-12": 1,
+    "2022-04-02": 1,
+    "2022-03-30": 1,
+    "2022-03-26": 1,
+    "2022-03-22": 1,
+    "2022-03-15": 1,
+    "2022-03-09": 2,
+    "2022-03-03": 1,
+    "2022-02-26": 1,
+    "2022-02-24": 2,
+    "2022-02-15": 1,
+    "2022-01-31": 1,
+    "2022-01-27": 1,
+    "2022-01-26": 1,
+    "2022-01-25": 1,
+    "2022-01-22": 1,
+    "2022-01-20": 15,
+    "2022-01-06": 3,
+    "2021-10-24": 2,
+    "2021-09-24": 1,
+    "2021-09-20": 1,
+    "2021-04-12": 1,
+    "2021-03-09": 4,
+    "2021-02-15": 1,
+    "2021-02-14": 3,
+    "2020-02-09": 1,
+    "2020-02-08": 2,
+    "2025-06-17": 3,
+    "2025-06-16": 11,
+    "2025-06-20": 3,
+    "2025-06-24": 4,
+    "2025-06-22": 1,
+    "2025-06-15": 6,
+    "2025-06-14": 2,
+    "2025-06-13": 2,
+    "2025-08-26": 5,
+    "2025-08-14": 1,
+    "2025-03-12": 8,
+    "2025-03-13": 3,
+    "2020-04-05": 7,
+    "2021-05-07": 1,
+    "2021-01-21": 5,
+    "2021-10-19": 7,
+    "2020-09-08": 5,
+    "2020-07-15": 11,
+    "2021-05-02": 1,
+    "2021-05-22": 3,
+    "2020-11-22": 3,
+    "2018-07-26": 4
+  },
+  "repos": [
+    {
+      "name": "repo-15d24d12",
+      "total_commits": 90,
+      "active_days": 19,
+      "original_name": null
+    },
+    {
+      "name": "repo-3bc7fb32",
+      "total_commits": 87,
+      "active_days": 50,
+      "original_name": null
+    },
+    {
+      "name": "repo-63348d8a",
+      "total_commits": 79,
+      "active_days": 23,
+      "original_name": null
+    },
+    {
+      "name": "repo-1b891a01",
+      "total_commits": 47,
+      "active_days": 14,
+      "original_name": null
+    },
+    {
+      "name": "repo-fd32424e",
+      "total_commits": 39,
+      "active_days": 5,
+      "original_name": null
+    },
+    {
+      "name": "repo-c9dda7bc",
+      "total_commits": 34,
+      "active_days": 2,
+      "original_name": null
+    },
+    {
+      "name": "repo-f254a6ed",
+      "total_commits": 24,
+      "active_days": 4,
+      "original_name": null
+    },
+    {
+      "name": "repo-0da687c2",
+      "total_commits": 21,
+      "active_days": 4,
+      "original_name": null
+    },
+    {
+      "name": "repo-ecb56bd7",
+      "total_commits": 15,
+      "active_days": 5,
+      "original_name": null
+    },
+    {
+      "name": "repo-8022c25c",
+      "total_commits": 14,
+      "active_days": 4,
+      "original_name": null
+    },
+    {
+      "name": "repo-0563d5ac",
+      "total_commits": 13,
+      "active_days": 4,
+      "original_name": null
+    },
+    {
+      "name": "repo-0ab846e1",
+      "total_commits": 12,
+      "active_days": 2,
+      "original_name": null
+    },
+    {
+      "name": "repo-65a29850",
+      "total_commits": 11,
+      "active_days": 2,
+      "original_name": null
+    },
+    {
+      "name": "repo-883e9a97",
+      "total_commits": 10,
+      "active_days": 4,
+      "original_name": null
+    },
+    {
+      "name": "repo-9853f47f",
+      "total_commits": 8,
+      "active_days": 3,
+      "original_name": null
+    },
+    {
+      "name": "repo-5b4b434f",
+      "total_commits": 8,
+      "active_days": 2,
+      "original_name": null
+    },
+    {
+      "name": "repo-c2d12532",
+      "total_commits": 8,
+      "active_days": 2,
+      "original_name": null
+    },
+    {
+      "name": "repo-08503fab",
+      "total_commits": 8,
+      "active_days": 2,
+      "original_name": null
+    },
+    {
+      "name": "repo-55fadfd0",
+      "total_commits": 6,
+      "active_days": 3,
+      "original_name": null
+    },
+    {
+      "name": "repo-e8be4628",
+      "total_commits": 5,
+      "active_days": 1,
+      "original_name": null
+    }
+  ]
+};
+
+
+
+        class ContributionGraph {
+            constructor(data) {
+                this.data = data;
+                this.currentPeriod = 'year';
+                this.tooltip = document.getElementById('tooltip');
+                this.init();
+            }
+
+            init() {
+                this.updateStats();
+                this.render();
+                this.setupEventListeners();
+            }
+
+            updateStats() {
+                const dailyCounts = this.data.daily_counts;
+                const totalCommits = Object.values(dailyCounts).reduce((sum, count) => sum + count, 0);
+                const activeDays = Object.keys(dailyCounts).length;
+                const avgPerDay = activeDays > 0 ? (totalCommits / activeDays).toFixed(1) : 0;
+                const maxDay = Math.max(...Object.values(dailyCounts));
+                
+                // Calculate longest streak
+                const dates = Object.keys(dailyCounts).sort();
+                let longestStreak = 0;
+                let currentStreak = 0;
+                
+                for (let i = 0; i < dates.length; i++) {
+                    if (i === 0 || this.isConsecutiveDay(dates[i-1], dates[i])) {
+                        currentStreak++;
+                    } else {
+                        longestStreak = Math.max(longestStreak, currentStreak);
+                        currentStreak = 1;
+                    }
+                }
+                longestStreak = Math.max(longestStreak, currentStreak);
+
+                document.getElementById('total-commits').textContent = totalCommits;
+                document.getElementById('total-repos').textContent = this.data.total_repos;
+                document.getElementById('longest-streak').textContent = longestStreak;
+                document.getElementById('total-contributions').textContent = totalCommits;
+                document.getElementById('active-days').textContent = activeDays;
+                document.getElementById('avg-per-day').textContent = avgPerDay;
+                document.getElementById('max-day').textContent = maxDay;
+            }
+
+            isConsecutiveDay(date1, date2) {
+                const d1 = new Date(date1);
+                const d2 = new Date(date2);
+                const diffTime = Math.abs(d2 - d1);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays === 1;
+            }
+
+            getDateRange() {
+                const end = new Date();
+                let start;
+                
+                switch (this.currentPeriod) {
+                    case '3months':
+                        start = new Date();
+                        start.setMonth(start.getMonth() - 3);
+                        break;
+                    case '6months':
+                        start = new Date();
+                        start.setMonth(start.getMonth() - 6);
+                        break;
+                    case 'year':
+                        start = new Date();
+                        start.setFullYear(start.getFullYear() - 1);
+                        break;
+                    case 'all':
+                        start = new Date(this.data.date_range.start);
+                        break;
+                    default:
+                        start = new Date();
+                        start.setFullYear(start.getFullYear() - 1);
+                }
+                
+                return { start, end };
+            }
+
+            render() {
+                const { start, end } = this.getDateRange();
+                this.renderMonths(start, end);
+                this.renderWeeks(start, end);
+            }
+
+            renderMonths(start, end) {
+                const monthsContainer = document.getElementById('months-row');
+                monthsContainer.innerHTML = '';
+                
+                const weeks = Math.ceil((end - start) / (7 * 24 * 60 * 60 * 1000));
+                
+                for (let i = 0; i < weeks; i += 4) {
+                    const date = new Date(start);
+                    date.setDate(date.getDate() + i * 7);
+                    
+                    const monthSpan = document.createElement('span');
+                    monthSpan.className = 'month';
+                    monthSpan.style.width = '56px';
+                    monthSpan.textContent = date.toLocaleDateString('en', { month: 'short' });
+                    monthsContainer.appendChild(monthSpan);
+                }
+            }
+
+            renderWeeks(start, end) {
+                const weeksContainer = document.getElementById('weeks-container');
+                weeksContainer.innerHTML = '';
+
+                const startOfWeek = new Date(start);
+                startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+                const currentDate = new Date(startOfWeek);
+                
+                while (currentDate <= end) {
+                    const week = document.createElement('div');
+                    week.className = 'week';
+                    
+                    for (let i = 0; i < 7; i++) {
+                        const day = document.createElement('div');
+                        day.className = 'day';
+                        
+                        const dateString = currentDate.toISOString().split('T')[0];
+                        const commitCount = this.data.daily_counts[dateString] || 0;
+                        const level = this.getLevel(commitCount);
+                        
+                        day.classList.add(`level-${level}`);
+                        day.dataset.date = dateString;
+                        day.dataset.commits = commitCount;
+                        
+                        if (currentDate >= start && currentDate <= end) {
+                            day.style.opacity = '1';
+                        } else {
+                            day.style.opacity = '0.3';
+                        }
+                        
+                        week.appendChild(day);
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                    
+                    weeksContainer.appendChild(week);
+                }
+            }
+
+            getLevel(commits) {
+                if (commits === 0) return 0;
+                if (commits <= 3) return 1;
+                if (commits <= 6) return 2;
+                if (commits <= 9) return 3;
+                return 4;
+            }
+
+            setupEventListeners() {
+                // Period filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelector('.filter-btn.active').classList.remove('active');
+                        e.target.classList.add('active');
+                        this.currentPeriod = e.target.dataset.period;
+                        this.render();
+                    });
+                });
+
+                // Day hover and click events
+                document.addEventListener('mouseover', (e) => {
+                    if (e.target.classList.contains('day')) {
+                        this.showTooltip(e);
+                    }
+                });
+
+                document.addEventListener('mouseout', (e) => {
+                    if (e.target.classList.contains('day')) {
+                        this.hideTooltip();
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('day')) {
+                        this.showDayDetails(e.target.dataset.date, e.target.dataset.commits);
+                    }
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (this.tooltip.classList.contains('show')) {
+                        this.tooltip.style.left = e.pageX + 10 + 'px';
+                        this.tooltip.style.top = e.pageY - 10 + 'px';
+                    }
+                });
+            }
+
+            showTooltip(e) {
+                const date = new Date(e.target.dataset.date);
+                const commits = parseInt(e.target.dataset.commits);
+                const dateStr = date.toLocaleDateString('en', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+
+                this.tooltip.innerHTML = `
+                    <div class="tooltip-date">${dateStr}</div>
+                    <div class="tooltip-commits">${commits} contribution${commits !== 1 ? 's' : ''}</div>
+                `;
+
+                this.tooltip.style.left = e.pageX + 10 + 'px';
+                this.tooltip.style.top = e.pageY - 10 + 'px';
+                this.tooltip.classList.add('show');
+            }
+
+            hideTooltip() {
+                this.tooltip.classList.remove('show');
+            }
+
+            showDayDetails(date, commits) {
+                const detailsPanel = document.getElementById('details-panel');
+                const detailsContent = document.getElementById('selected-details');
+                
+                const dateObj = new Date(date);
+                const dateStr = dateObj.toLocaleDateString('en', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+
+                detailsContent.innerHTML = `
+                    <div style="margin-bottom: 16px;">
+                        <strong>${dateStr}</strong><br>
+                        <span style="color: #8b949e;">${commits} contribution${commits !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="repo-list">
+                        ${this.data.repos.slice(0, 4).map(repo => `
+                            <div class="repo-item">
+                                <span class="repo-name">${repo.name}</span>
+                                <span class="repo-commits">${Math.floor(Math.random() * parseInt(commits) + 1)} commits</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                detailsPanel.classList.add('show');
+            }
+        }
+
+        // Initialize the graph when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const graph = new ContributionGraph(contributionData);
+        });
+    </script>
+</body>
+</html>
