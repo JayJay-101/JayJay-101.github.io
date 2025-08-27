@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile README</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #e6edf3;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #58a6ff 0%, transparent 70%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #58a6ff, #f85149, #7c3aed);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #21262d 0%, #30363d 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #58a6ff;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #8b949e;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #58a6ff, #f85149);
+            border-radius: 2px;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .skill-tag {
+            background: linear-gradient(135deg, #21262d, #30363d);
+            padding: 10px 15px;
+            border-radius: 25px;
+            text-align: center;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .skill-tag:hover {
+            background: linear-gradient(135deg, #58a6ff, #7c3aed);
+            transform: scale(1.05);
+            color: white;
+        }
+        
+        .contribution-heatmap {
+            background: #0d1117;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #30363d;
+        }
+        
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 3px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        .heatmap-day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background: #161b22;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .heatmap-day:hover {
+            transform: scale(1.2);
+            outline: 2px solid #58a6ff;
+        }
+        
+        .heatmap-day.level-1 { background: #0e4429; }
+        .heatmap-day.level-2 { background: #006d32; }
+        .heatmap-day.level-3 { background: #26a641; }
+        .heatmap-day.level-4 { background: #39d353; }
+        
+        .repos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .repo-card {
+            background: linear-gradient(135deg, #21262d, #30363d);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+        }
+        
+        .repo-card:hover {
+            transform: translateY(-3px);
+            border-color: #58a6ff;
+        }
+        
+        .repo-name {
+            font-size: 1.2rem;
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+        
+        .repo-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+        
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .achievement-card {
+            background: linear-gradient(135deg, #1a1f2e, #2d3748);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #58a6ff;
+            transition: all 0.3s ease;
+        }
+        
+        .achievement-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .achievement-title {
+            font-size: 1.1rem;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+        
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid #58a6ff;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #58a6ff; }
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .contact-link {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #58a6ff, #7c3aed);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(88, 166, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>System Architect & Full-Stack Engineer</h1>
+            <p class="typing-animation">Building scalable systems with advanced technology</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-commits">570</div>
+                <div class="stat-label">Total Commits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-repos">30</div>
+                <div class="stat-label">Repositories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="years-active">7</div>
+                <div class="stat-label">Years Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="languages">10+</div>
+                <div class="stat-label">Technologies</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🚀 Core Expertise</h2>
+            <div class="skills-grid">
+                <div class="skill-tag">Python</div>
+                <div class="skill-tag">PHP</div>
+                <div class="skill-tag">JavaScript</div>
+                <div class="skill-tag">Laravel</div>
+                <div class="skill-tag">Vue.js</div>
+                <div class="skill-tag">Redis</div>
+                <div class="skill-tag">Kubernetes</div>
+                <div class="skill-tag">Docker</div>
+                <div class="skill-tag">AWS</div>
+                <div class="skill-tag">GCP</div>
+                <div class="skill-tag">Vercel</div>
+                <div class="skill-tag">CI/CD</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📊 Contribution Activity</h2>
+            <div class="contribution-heatmap">
+                <div class="heatmap-grid" id="heatmap-grid">
+                    <!-- Heatmap will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🏆 Key Achievements</h2>
+            <div class="achievements">
+                <div class="achievement-card">
+                    <div class="achievement-title">Innovative Download Manager</div>
+                    <p>Developed first-of-its-kind browser extension with advanced edge case management and QR payment system for Indian market</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-title">Data Science Masters</div>
+                    <p>Advanced degree with specialization in Computer Vision and NLP, bringing AI/ML expertise to system design</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-title">Full-Stack Leadership</div>
+                    <p>Leading teams across backend engineering, database architecture, and system design with people management</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-title">Cloud Architecture</div>
+                    <p>Extensive experience with multi-cloud deployments using AWS, GCP, and modern DevOps practices</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📈 Top Repositories</h2>
+            <div class="repos-grid" id="repos-grid">
+                <!-- Repository cards will be generated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="contact-links">
+            <a href="#" class="contact-link">📧 Contact</a>
+            <a href="#" class="contact-link">💼 LinkedIn</a>
+            <a href="#" class="contact-link">🐦 Twitter</a>
+        </div>
+    </div>
+    
+    <script>
+        const contributionData = {
+            "generated_at": "2025-08-27T13:17:10.526692",
+            "total_repos": 30,
+            "total_commits": 570,
+            "date_range": {
+                "start": "2018-07-26",
+                "end": "2025-08-26"
+            },
+            "daily_counts": {
+                "2021-08-11": 3, "2021-07-25": 2, "2021-06-05": 17, "2021-06-04": 2, "2021-06-03": 5,
+                "2021-05-21": 5, "2021-05-06": 2, "2021-04-21": 1, "2021-04-20": 1, "2021-04-19": 2,
+                "2021-03-24": 1, "2021-03-23": 6, "2021-03-22": 1, "2021-03-21": 9, "2021-03-18": 2,
+                "2021-03-17": 18, "2021-03-13": 20, "2021-03-07": 9, "2021-01-13": 3, "2020-11-25": 5,
+                "2025-03-06": 5, "2025-03-05": 2, "2025-03-11": 1, "2025-03-10": 1, "2025-03-07": 6,
+                "2025-08-21": 8, "2025-08-20": 11, "2025-06-23": 8, "2025-06-11": 6, "2025-06-10": 3,
+                "2025-06-09": 4, "2025-06-08": 2, "2025-06-07": 1, "2025-06-05": 2, "2025-06-01": 10,
+                "2025-05-31": 6, "2025-05-30": 3, "2025-05-28": 4, "2025-05-27": 6, "2025-05-22": 2,
+                "2025-05-20": 1, "2025-08-22": 9, "2025-08-25": 8, "2025-08-24": 2, "2025-08-23": 3,
+                "2025-05-25": 1, "2025-05-24": 1, "2025-05-23": 2, "2025-04-29": 2, "2025-04-28": 1,
+                "2025-04-26": 6, "2025-04-25": 1, "2023-10-10": 1, "2022-08-29": 2, "2019-12-23": 10,
+                "2019-12-22": 1, "2023-05-14": 3, "2021-04-06": 13, "2021-04-05": 33, "2021-12-11": 3,
+                "2025-07-13": 1, "2025-07-11": 4, "2025-07-10": 3, "2024-11-16": 14, "2024-11-24": 8,
+                "2024-11-23": 10, "2024-11-18": 1, "2024-11-17": 6, "2023-12-04": 1, "2025-04-20": 1,
+                "2025-03-09": 3, "2025-02-28": 2, "2025-02-27": 2, "2025-02-23": 7, "2021-06-12": 1,
+                "2021-06-11": 7, "2025-06-12": 7, "2025-01-31": 1, "2024-03-05": 3, "2024-02-14": 2,
+                "2024-02-02": 4, "2023-08-22": 2, "2023-01-20": 2, "2022-12-13": 1, "2022-10-11": 3,
+                "2022-09-07": 1, "2022-08-19": 1, "2022-08-11": 1, "2022-07-29": 2, "2022-06-28": 1,
+                "2022-06-08": 1, "2022-06-06": 1, "2022-06-02": 1, "2022-05-30": 1, "2022-05-27": 1,
+                "2022-05-22": 1, "2022-05-17": 3, "2022-05-10": 1, "2022-04-30": 1, "2022-04-28": 1,
+                "2022-04-12": 1, "2022-04-02": 1, "2022-03-30": 1, "2022-03-26": 1, "2022-03-22": 1,
+                "2022-03-15": 1, "2022-03-09": 2, "2022-03-03": 1, "2022-02-26": 1, "2022-02-24": 2,
+                "2022-02-15": 1, "2022-01-31": 1, "2022-01-27": 1, "2022-01-26": 1, "2022-01-25": 1,
+                "2022-01-22": 1, "2022-01-20": 15, "2022-01-06": 3, "2021-10-24": 2, "2021-09-24": 1,
+                "2021-09-20": 1, "2021-04-12": 1, "2021-03-09": 4, "2021-02-15": 1, "2021-02-14": 3,
+                "2020-02-09": 1, "2020-02-08": 2, "2025-06-17": 3, "2025-06-16": 11, "2025-06-20": 3,
+                "2025-06-24": 4, "2025-06-22": 1, "2025-06-15": 6, "2025-06-14": 2, "2025-06-13": 2,
+                "2025-08-26": 5, "2025-08-14": 1, "2025-03-12": 8, "2025-03-13": 3, "2020-04-05": 7,
+                "2021-05-07": 1, "2021-01-21": 5, "2021-10-19": 7, "2020-09-08": 5, "2020-07-15": 11,
+                "2021-05-02": 1, "2021-05-22": 3, "2020-11-22": 3, "2018-07-26": 4
+            },
+            "repos": [
+                {"name": "repo-15d24d12", "total_commits": 90, "active_days": 19, "original_name": null},
+                {"name": "repo-3bc7fb32", "total_commits": 87, "active_days": 50, "original_name": null},
+                {"name": "repo-63348d8a", "total_commits": 79, "active_days": 23, "original_name": null},
+                {"name": "repo-1b891a01", "total_commits": 47, "active_days": 14, "original_name": null},
+                {"name": "repo-fd32424e", "total_commits": 39, "active_days": 5, "original_name": null},
+                {"name": "repo-c9dda7bc", "total_commits": 34, "active_days": 2, "original_name": null},
+                {"name": "repo-f254a6ed", "total_commits": 24, "active_days": 4, "original_name": null},
+                {"name": "repo-0da687c2", "total_commits": 21, "active_days": 4, "original_name": null}
+            ]
+        };
+        
+        // Animate stats counters
+        function animateCounter(elementId, targetValue, duration = 2000) {
+            const element = document.getElementById(elementId);
+            const startValue = 0;
+            const increment = targetValue / (duration / 16);
+            let currentValue = startValue;
+            
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    element.textContent = targetValue;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(currentValue);
+                }
+            }, 16);
+        }
+        
+        // Generate contribution heatmap
+        function generateHeatmap() {
+            const heatmapGrid = document.getElementById('heatmap-grid');
+            const maxCommits = Math.max(...Object.values(contributionData.daily_counts));
+            
+            // Generate past year dates
+            const today = new Date();
+            const startDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+            
+            for (let i = 0; i < 365; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateString = currentDate.toISOString().split('T')[0];
+                
+                const day = document.createElement('div');
+                day.className = 'heatmap-day';
+                
+                const commits = contributionData.daily_counts[dateString] || 0;
+                if (commits > 0) {
+                    const level = Math.ceil((commits / maxCommits) * 4);
+                    day.classList.add(`level-${level}`);
+                    day.title = `${dateString}: ${commits} commits`;
+                }
+                
+                heatmapGrid.appendChild(day);
+            }
+        }
+        
+        // Generate repository cards
+        function generateRepoCards() {
+            const reposGrid = document.getElementById('repos-grid');
+            const topRepos = contributionData.repos.slice(0, 6);
+            
+            topRepos.forEach(repo => {
+                const card = document.createElement('div');
+                card.className = 'repo-card';
+                card.innerHTML = `
+                    <div class="repo-name">${repo.name}</div>
+                    <div class="repo-stats">
+                        <span>🔥 ${repo.total_commits} commits</span>
+                        <span>📅 ${repo.active_days} active days</span>
+                    </div>
+                `;
+                reposGrid.appendChild(card);
+            });
+        }
+        
+        // Initialize animations and data
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate counters
+            setTimeout(() => animateCounter('total-commits', 570), 500);
+            setTimeout(() => animateCounter('total-repos', 30), 700);
+            setTimeout(() => animateCounter('years-active', 7), 900);
+            
+            // Generate visualizations
+            generateHeatmap();
+            generateRepoCards();
+            
+            // Add skill tag interactions
+            document.querySelectorAll('.skill-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    this.style.background = 'linear-gradient(135deg, #f85149, #58a6ff)';
+                    setTimeout(() => {
+                        this.style.background = '';
+                    }, 300);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
